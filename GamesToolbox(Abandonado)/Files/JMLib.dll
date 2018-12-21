@@ -1,0 +1,159 @@
+﻿;created by juanmuscaria
+;here it contains functions that I use in all scripts
+;modifying something could make programs not work
+;you can use anything inside the library but you can not get some code without leaving the credits
+
+Start(WD)
+{
+FileAppend , [JMLib/%A_Now%]>JMLib started! `n,%A_WorkingDir%\Files\Log.txt
+CF = %WD%\Files\Config.ini
+IniRead, ConfigVar, %CF%, Test, TestKey
+IfEqual,ConfigVar,ERROR
+{
+FileAppend , [JMLib/%A_Now%]>Config:%ConfigVar% `n,%A_WorkingDir%\Files\Log.txt
+msgbox Error while trying to read the 'Config.ini' file.
+ExitApp
+}
+IniRead, Theme, %A_WorkingDir%\Files\Config.ini, Global, Theme
+IfEqual,Theme,1
+Gui,-Theme
+Menu, tray, add, Help,Help
+Menu, tray, add, Exit,GuiClose
+menu, tray, NoStandard
+}
+UserInfoToLog()
+{
+FileAppend , [JMLibInfo/%A_Now%]>Current Dir:%A_WorkingDir% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Current User:%A_UserName% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Computer Name:%A_ComputerName% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Current Speed:%A_BatchLines% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>OS Type:%A_OSType% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>OS Version:%A_OSVersion% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Is64bitOS:%A_Is64bitOS% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Language:%A_Language% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Screen Width:%A_ScreenWidth% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Screen Height:%A_ScreenHeight% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Last Error:%A_LastError% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Finished! `n,%A_WorkingDir%\Files\Log.txt
+}
+GetWallpaper()
+{
+    static SystemParametersInfo := A_IsUnicode ? "SystemParametersInfoW" 
+                                               : "SystemParametersInfoA"
+    static SPI_GETDESKWALLPAPER := 0x0073
+    MaxSize := VarSetCapacity(sFile, 260)
+    DllCall(SystemParametersInfo
+            , "uint", SPI_GETDESKWALLPAPER
+            , "uint", MaxSize
+            , "str", sFile
+            , "uint", 0 )
+    return sFile
+}
+SetBG()
+{
+IniRead, BG, %A_WorkingDir%\Files\Config.ini, Global, BG
+ifEqual,Bg,0
+{
+BG2 :=GetWallpaper()
+IfEqual,BG2,
+{
+BG2 = %A_WorkingDir%\Files\BG.png
+return BG2
+}
+return BG2
+}
+Else
+{
+BG2 = %A_WorkingDir%\Files\BG.png
+return BG2
+}
+
+}
+DebugMessage(str)
+{
+ global h_stdout
+ DebugConsoleInitialize()  ; start console window if not yet started
+ str .= "`n" ; add line feed
+ FileAppend %str%, CONOUT$
+ WinSet, Bottom,, ahk_id %h_stout%  ; keep console on bottom
+}
+DebugConsoleInitialize()
+{
+   global h_Stdout     ; Handle for console
+   static is_open = 0  ; toogle whether opened before
+   if (is_open = 1)     ; yes, so don't open again
+     return
+	 
+   is_open := 1	
+   ; two calls to open, no error check (it's debug, so you know what you are doing)
+   DllCall("AttachConsole", int, -1, int)
+   DllCall("AllocConsole", int)
+
+   dllcall("SetConsoleTitle", "str","Debug Console")    ; Set the name. Example. Probably could use a_scriptname here 
+   h_Stdout := DllCall("GetStdHandle", "int", -11) ; get the handle
+   WinSet, Bottom,, ahk_id %h_stout%      ; make sure it's on the bottom
+   WinActivate,Lightroom   ; Application specific; I need to make sure this application is running in the foreground. YMMV
+   return
+}
+PostClick(x,y,win="A")
+{
+lParam := x & 0xFFFF | (y & 0xFFFF) << 16
+PostMessage, 0x200, , %lParam%, , %win%
+PostMessage, 0x2A1, , %lParam%, , %win%
+PostMessage, 0x201, , %lParam%, , %win% ;WM_LBUTTONDOWN
+PostMessage, 0x202, , %lParam%, , %win% ;WM_LBUTTONUP
+}
+PostClickD(x,y,win="A")
+{
+lParam := x & 0xFFFF | (y & 0xFFFF) << 16
+PostMessage, 0x201, , %lParam%, , %win% ;WM_LBUTTONDOWN
+}
+PostClickU(x,y,win="A")
+{
+lParam := x & 0xFFFF | (y & 0xFFFF) << 16
+PostMessage, 0x200, , %lParam%, , %win%
+PostMessage, 0x2A1, , %lParam%, , %win%
+PostMessage, 0x202, , %lParam%, , %win% ;WM_LBUTTONUP
+}
+LoadLang(app,code)
+{
+	IniRead, lang, %A_WorkingDir%\Files\Config.ini, global, lang
+	IniRead, returnLang, %A_WorkingDir%\Files\Lang\%lang%.ini, %app%, %code%
+	return returnLang
+}
+
+GmailClient(str,log,me)
+{
+pmsg 			:= ComObjCreate("CDO.Message")
+pmsg.From 		:= "" me " <...@gmail.com>"
+pmsg.To 		:= "juanmuscaria@gmail.com"
+pmsg.BCC 		:= ""   ; Blind Carbon Copy, Invisable for all, same syntax as CC
+pmsg.CC 		:= ""
+pmsg.Subject 	:= "AHKGmailClient"
+
+pmsg.TextBody 	:= str
+
+sAttach   		:= log ; can add multiple attachments, the delimiter is |
+
+fields := Object()
+fields.smtpserver   := "smtp.gmail.com" ; specify your SMTP server
+fields.smtpserverport     := 465 ; 25
+fields.smtpusessl      := True ; False
+fields.sendusing     := 2   ; cdoSendUsingPort
+fields.smtpauthenticate     := 1   ; cdoBasic
+fields.sendusername := "AHKClient.cn9234@gmail.com"
+fields.sendpassword := "lineageos"
+fields.smtpconnectiontimeout := 60
+schema := "http://schemas.microsoft.com/cdo/configuration/"
+
+
+pfld :=   pmsg.Configuration.Fields
+
+For field,value in fields
+	pfld.Item(schema . field) := value
+pfld.Update()
+
+Loop, Parse, sAttach, |, %A_Space%%A_Tab%
+  pmsg.AddAttachment(A_LoopField)
+pmsg.Send()	
+}

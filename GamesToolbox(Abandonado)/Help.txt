@@ -1,0 +1,52 @@
+Portugês--------------------------------------------------------
+Auto-Farm:
+F1:Inicia o aplicativo.
+F2:Pausa.
+F10:Fecha o aplicativo.
+
+PDoor Bruteforce:
+F1:Inicia o aplicativo.
+F2:Pausa.
+F10:Fecha o aplicativo.
+
+SpaMEr:
+Em modo normal:
+F1-F5:Manda o spam correspondente a seu slot.
+F10:Fecha o aplicativo.
+Em modo auto-spam:
+F1:Inicia o aplicativo.
+F2-F5:Desativado.
+F6:Pausa:
+F10:Fecha o aplicativo.
+
+Grass Auto-Farm:
+Por estar em beta muita coisa vai mudar.
+F1:Inicia o aplicativo.
+F2:Pausa.
+F10:Fecha o aplicativo.
+English--------------------------------------------------------
+#Translated by google translator :P#
+Auto-Farm:
+F1: Start the application.
+F2: Pause.
+F10: Closes the application.
+
+PDoor Bruteforce:
+F1: Start the application.
+F2: Pause.
+F10: Closes the application.
+
+SpaMEr:
+In normal mode:
+F1-F5: Send out the spam
+F10: Closes the application.
+In auto-spam mode:
+F1: Start the application.
+F2-F5: Disabled.
+F6: Pause:
+F10: Closes the application.
+
+Grass Auto-Farm:
+F1: Start the application.
+F2: Pause.
+F10: Closes the application.

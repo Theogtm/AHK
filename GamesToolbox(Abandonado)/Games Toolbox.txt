@@ -1,0 +1,248 @@
+; <COMPILER: v1.1.26.01>
+Start(WD)
+{
+
+FileAppend , [JMLib/%A_Now%]>JMLib started! `n,%A_WorkingDir%\Files\Log.txt
+CF = %WD%\Files\Config.ini
+IniRead, ConfigVar, %CF%, Test, TestKey
+IfEqual,ConfigVar,ERROR
+
+{
+
+FileAppend , [JMLib/%A_Now%]>Config:%ConfigVar% `n,%A_WorkingDir%\Files\Log.txt
+msgbox Error while trying to read the 'Config.ini' file.
+ExitApp
+
+}
+
+IniRead, Theme, %A_WorkingDir%\Files\Config.ini, Global, Theme
+IfEqual,Theme,1
+Gui,-Theme
+Menu, tray, add, Help,Help
+Menu, tray, add, Exit,GuiClose
+menu, tray, NoStandard
+
+}
+UserInfoToLog()
+
+{
+
+FileAppend , [JMLibInfo/%A_Now%]>Current Dir:%A_WorkingDir% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Current User:%A_UserName% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Computer Name:%A_ComputerName% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Current Speed:%A_BatchLines% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>OS Type:%A_OSType% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>OS Version:%A_OSVersion% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Is64bitOS:%A_Is64bitOS% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Language:%A_Language% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Screen Width:%A_ScreenWidth% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Screen Height:%A_ScreenHeight% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Last Error:%A_LastError% `n,%A_WorkingDir%\Files\Log.txt
+FileAppend , [JMLibInfo/%A_Now%]>Finished! `n,%A_WorkingDir%\Files\Log.txt
+
+}
+
+GetWallpaper()
+
+{
+
+static SystemParametersInfo := A_IsUnicode ? "SystemParametersInfoW"
+: "SystemParametersInfoA"
+static SPI_GETDESKWALLPAPER := 0x0073
+MaxSize := VarSetCapacity(sFile, 260)
+DllCall(SystemParametersInfo
+, "uint", SPI_GETDESKWALLPAPER
+, "uint", MaxSize
+, "str", sFile
+, "uint", 0 )
+return sFile
+
+}
+
+SetBG()
+
+{
+
+IniRead, BG, %A_WorkingDir%\Files\Config.ini, Global, BG
+ifEqual,Bg,0
+
+{
+
+BG2 :=GetWallpaper()
+IfEqual,BG2,
+
+{
+
+BG2 = %A_WorkingDir%\Files\BG.png
+return BG2
+
+}
+
+return BG2
+
+}
+
+Else
+
+{
+
+BG2 = %A_WorkingDir%\Files\BG.png
+return BG2
+
+}
+}
+
+DebugMessage(str)
+
+{
+
+global h_stdout
+DebugConsoleInitialize()
+str .= "`n"
+FileAppend %str%, CONOUT$
+WinSet, Bottom,, ahk_id %h_stout%
+
+}
+
+DebugConsoleInitialize()
+{
+
+global h_Stdout
+static is_open = 0
+if (is_open = 1)
+return
+is_open := 1
+DllCall("AttachConsole", int, -1, int)
+DllCall("AllocConsole", int)
+dllcall("SetConsoleTitle", "str","Debug Console")
+h_Stdout := DllCall("GetStdHandle", "int", -11)
+WinSet, Bottom,, ahk_id %h_stout%
+WinActivate,Lightroom
+return
+}
+PostClick(x,y,win="A")
+{
+lParam := x & 0xFFFF | (y & 0xFFFF) << 16
+PostMessage, 0x200, , %lParam%, , %win%
+PostMessage, 0x2A1, , %lParam%, , %win%
+PostMessage, 0x201, , %lParam%, , %win%
+PostMessage, 0x202, , %lParam%, , %win%
+}
+PostClickD(x,y,win="A")
+{
+lParam := x & 0xFFFF | (y & 0xFFFF) << 16
+PostMessage, 0x201, , %lParam%, , %win%
+}
+PostClickU(x,y,win="A")
+{
+lParam := x & 0xFFFF | (y & 0xFFFF) << 16
+PostMessage, 0x200, , %lParam%, , %win%
+PostMessage, 0x2A1, , %lParam%, , %win%
+PostMessage, 0x202, , %lParam%, , %win%
+}
+LoadLang(app,code)
+{
+IniRead, lang, %A_WorkingDir%\Files\Config.ini, global, lang
+IniRead, returnLang, %A_WorkingDir%\Files\Lang\%lang%.ini, %app%, %code%
+return returnLang
+}
+GmailClient(str,log,me)
+{
+pmsg 			:= ComObjCreate("CDO.Message")
+pmsg.From 		:= "" me " <...@gmail.com>"
+pmsg.To 		:= "juanmuscaria@gmail.com"
+pmsg.BCC 		:= ""
+pmsg.CC 		:= ""
+pmsg.Subject 	:= "AHKGmailClient"
+pmsg.TextBody 	:= str
+sAttach   		:= log
+fields := Object()
+fields.smtpserver   := "smtp.gmail.com"
+fields.smtpserverport     := 465
+fields.smtpusessl      := True
+fields.sendusing     := 2
+fields.smtpauthenticate     := 1
+fields.sendusername := "AHKClient.cn9234@gmail.com"
+fields.sendpassword := "lineageos"
+fields.smtpconnectiontimeout := 60
+schema := "http://schemas.microsoft.com/cdo/configuration/"
+pfld :=   pmsg.Configuration.Fields
+For field,value in fields
+pfld.Item(schema . field) := value
+pfld.Update()
+Loop, Parse, sAttach, |, %A_Space%%A_Tab%
+pmsg.AddAttachment(A_LoopField)
+pmsg.Send()
+}
+IniWrite, %A_WorkingDir%, %A_WorkingDir%\Files\Config.ini, Global, A_WorkingDir
+Start(A_WorkingDir)
+FileAppend , [GTB/%A_Now%]>Starting `n,%A_WorkingDir%\Files\Log.txt
+SendMode Input
+#SingleInstance force
+RunWait,Logo.exe 2000,,UseErrorLevel
+FileAppend , [GTB/%A_Now%]>Logo:%ErrorLevel% `n,%A_WorkingDir%\Files\Log.txt
+UserInfoToLog()
+BGM := SetBG()
+StartScript:
+Gui,New,Resize,MainWin
+Gui, Color,Black
+Gui, font, s13 cSilver q4
+Gui, Add, Picture,x0 y0 w600 h400 vBG +BackgroundTrans,%BGM%
+lang := LoadLang("launcher","1")
+Gui,Add,Text,x10 y10 +BackgroundTrans,%lang%
+lang := LoadLang("launcher","2")
+gui,add,button,gAF,%lang%
+lang := LoadLang("launcher","3")
+gui,add,button,gSpamMEr,%lang%
+lang := LoadLang("launcher","4")
+gui,add,button,gAPD,%lang%
+lang := LoadLang("launcher","5")
+Gui,Add,Text,x200 y10 +BackgroundTrans,%lang%
+lang := LoadLang("launcher","6")
+gui,add,button,gGAF,%lang%
+lang := LoadLang("launcher","7")
+Gui,Add,Text,x450 y10 +BackgroundTrans,%lang%
+lang := LoadLang("launcher","8")
+Gui,Add,Text,+BackgroundTrans,%lang%
+Gui, Add, DropDownList, vNewLang +BackgroundTrans,  en||pt-br
+lang := LoadLang("launcher","9")
+gui,add,button,gAplicar,%lang%
+lang := LoadLang("launcher","10")
+gui,add,button,gComent,%lang%
+Gui, Show,w700 h400 center,Games ToolBox
+return
+Help:
+Run Help.txt
+return
+GuiClose:
+ExitApp
+GuiSize:
+Width = %A_GuiWidth%
+Height = %A_GuiHeight%
+GuiControl,, BG, *w%width% *h%height% %BGM%
+return
+Coment:
+lang := LoadLang("launcher","ERROR2")
+InputBox, Coment,AHKGmailClient,%lang%
+LogDir = %A_WorkingDir%\Files\Log.txt
+GmailClient(Coment,LogDir,A_UserName)
+return
+Aplicar:
+Gui,Submit
+IniWrite, %NewLang%, %A_WorkingDir%\Files\Config.ini, global, lang
+Gui, Destroy
+goto, StartScript
+AF:
+Run %A_WorkingDir%\Auto Farm.exe 0x5243
+return
+SpamMEr:
+Run %A_WorkingDir%\SpamMEr.exe 0x224433
+return
+APD:
+Run %A_WorkingDir%\PDoor Bruteforce.exe 0x1234
+Return
+GAF:
+lang := LoadLang("launcher","ERROR1")
+MsgBox, 8208, ##Warning##, %lang%
+Run %A_WorkingDir%\Grass Auto-Farm.exe
+Return

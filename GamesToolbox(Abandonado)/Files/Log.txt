@@ -1,0 +1,15 @@
+[Test/20180324180456]>Runing Test 
+[JMLibInfo/20180324180456]>Current Dir:C:\Juanmuscaria\Games Toolbox 
+[JMLibInfo/20180324180456]>Current User:juan 
+[JMLibInfo/20180324180456]>Computer Name:JUAN-WIN7-PC 
+[JMLibInfo/20180324180456]>Current Speed:10ms 
+[JMLibInfo/20180324180456]>OS Type:WIN32_NT 
+[JMLibInfo/20180324180456]>OS Version:WIN_7 
+[JMLibInfo/20180324180456]>Is64bitOS:1 
+[JMLibInfo/20180324180456]>Language:0416 
+[JMLibInfo/20180324180456]>Screen Width:1280 
+[JMLibInfo/20180324180456]>Screen Height:960 
+[JMLibInfo/20180324180456]>Last Error:183 
+[JMLibInfo/20180324180456]>Finished! 
+[JMLib/20180324180524]>Restoring settings
+[JMLib/20180324180527]>Restoring settings

@@ -1,0 +1,4 @@
+7-zip
+  (1) that you used parts of the 7-Zip program, 
+  (2) that 7-Zip is licensed under the GNU LGPL license and 
+  (3) you must give a link to www.7-zip.org, where the source code can be found.
